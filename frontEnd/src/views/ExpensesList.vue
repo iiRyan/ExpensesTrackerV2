@@ -1,5 +1,6 @@
 <template>
     <div>
+    <div>
         <Navbar />
     </div>
     <div class="flex items-center justify-center mb-3 my-10 mx-auto gap-10">
@@ -140,6 +141,7 @@
             </div>
         </div>
     </div>
+    </div>
 </template>
 
 <script setup>
@@ -193,25 +195,25 @@ const state = reactive({
     errors: null,
 });
 console.log(route.params.monthId);
-const createExpense = async () => {
-    try {
-        const response = await axios.post('http://127.0.0.1:8000/api/expenses', {
-            description: state.description,
-            month_id: route.params.monthId,
-            amount: state.amount,
-            bank_account: state.bank_account,
-        }, {
-            headers: { Authorization: `Bearer ${store.token}` },
+// const createExpense = async () => {
+//     try {
+//         const response = await axios.post('http://127.0.0.1:8000/api/expenses', {
+//             description: state.description,
+//             month_id: route.params.monthId,
+//             amount: state.amount,
+//             bank_account: state.bank_account,
+//         }, {
+//             headers: { Authorization: `Bearer ${store.token}` },
 
-        }
-        );
-    } catch (error) {
+//         }
+//         );
+//     } catch (error) {
 
 
-        console.error(error);
-    }
-    return { state, createExpense };
-};
+//         console.error(error);
+//     }
+//     return { state, createExpense };
+// };
 
 const loadData = async () => {
     const monthId = route.params.monthId;
@@ -228,6 +230,26 @@ const loadData = async () => {
 
 loadData();
 
+const createExpense = async () => {
+    try {
+        await axios.post('http://127.0.0.1:8000/api/expenses', {
+            description: state.description,
+            month_id: 1,
+            amount: state.amount,
+            bank_account: state.bank_account,
+        }, {
+            headers: { Authorization: `Bearer ${store.token}` },
+
+        }
+        );
+        // Reload the data after successfully posting the new expense
+        await loadData();
+        // Close the modal after successfully posting the new expense
+        closeModal();
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 
 </script>

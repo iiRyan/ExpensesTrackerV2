@@ -1,4 +1,5 @@
 <template>
+    <div>
     <div class="flex items-center justify-center mb-3 my-10 mx-auto gap-10">
         <h1 class="text-3xl font-semibold">Expenses List</h1>
         <div class="items-center justify-center">
@@ -24,20 +25,20 @@
                                 <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
                                     Add new Budget
                                 </DialogTitle>
-                                <form class="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8 p-10" action="POST">
+                                <form class="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8 p-10" action="POST" @submit.prevent="createExpense">
                                     <div>
                                         <label for="month"
                                             class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-900">Description</label>
                                         <input type="text" id="month"
                                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-500 dark:placeholder-gray-400 dark:text-black"
-                                            required="">
+                                            required="" v-model="state.description">
                                     </div>
                                     <div>
                                         <label for="amount"
                                             class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-900">Amount</label>
                                         <input type="number"
                                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-500 dark:placeholder-gray-400 dark:text-black"
-                                            required="">
+                                            required="" v-model="state.amount">
                                     </div>
                                     <div>
                                         <label for="month"
@@ -45,7 +46,7 @@
                                             Account</label>
                                         <input type="text" id="month"
                                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-500 dark:placeholder-gray-400 dark:text-black"
-                                            required="">
+                                            required="" v-model="state.bank_account" >
                                     </div>
                                     <button type="submit"
                                         class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg
@@ -53,7 +54,8 @@
                                 </form>
                                 <div class="mt-4">
                                     <button type="button"
-                                        class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                        class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900
+                                         hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                         @click="closeModal">
                                         Cancel
                                     </button>
@@ -100,10 +102,10 @@
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm text-gray-500"> {{ month.relationships.userEmail }}</div>
+                        <div class="text-sm text-gray-500"> {{ month.attributes.amount }}</div>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-500">
-                        {{ month.attributes.status }}
+                        {{ month.attributes.bank_account }}
                     </td>
                     <td class="px-6 py-4">
                         <a href="#">
@@ -128,10 +130,11 @@
             </tbody>
         </table>
     </div>
+</div>
 </template>
 <script setup>
 import axios from 'axios';
-import { ref } from 'vue';
+import { reactive, ref , } from 'vue';
 import { store } from '../store';
 import { onMounted } from 'vue';
 
@@ -173,11 +176,18 @@ onMounted(() => {
     loadData();
 });
 
+
+const state = reactive({
+    description: '',
+    month_id: '',
+    amount: '',
+    bank_account: '',
+});
 const createExpense = async () => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/api/expenses', {
+        await axios.post('http://127.0.0.1:8000/api/expenses', {
             description: state.description,
-            month_id: route.params.monthId,
+            month_id: 1,
             amount: state.amount,
             bank_account: state.bank_account,
         }, {
@@ -185,12 +195,13 @@ const createExpense = async () => {
 
         }
         );
+        // Reload the data after successfully posting the new expense
+        await loadData();
+        // Close the modal after successfully posting the new expense
+        closeModal();
     } catch (error) {
-
-
         console.error(error);
     }
-    return { state, createExpense };
 };
 
 </script>
