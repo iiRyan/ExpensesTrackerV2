@@ -67,8 +67,15 @@ class MonthsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Month $month)
     {
-        //
+        return $this->isNotAuthorized($month) ? $this->isNotAuthorized($month) : $month->delete();
+    }
+
+    private function isNotAuthorized($month)
+    {
+        if (Auth::user()->id !== $month->user_id) {
+            return $this->error('', 'You are not authorized to make this request', 403);
+        }
     }
 }

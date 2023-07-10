@@ -7,6 +7,7 @@ use App\Http\Resources\ExpensesResource;
 use App\Models\Expense;
 use App\Models\Month;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ExpensesController extends Controller
 {
@@ -16,6 +17,10 @@ class ExpensesController extends Controller
         $query = Expense::all();
 
         return ExpensesResource::collection($query);
+
+
+        // $expenses = Expense::select('expenses.*', DB::raw('MONTHNAME(expenses.created_at) as month_name'))->get();
+        // return ExpensesResource::collection($expenses);
     }
     /**
      * Display a listing of the resource.
@@ -74,8 +79,15 @@ class ExpensesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Expense $expense)
     {
-        //
+        return $this->isNotAuthorized($expense) ? $this->isNotAuthorized($expense) : $expense->delete();
+    }
+
+    private function isNotAuthorized($month)
+    {
+        if (Month::where('month_id', $month) !== $month->user_id) {
+            return $this->error('', 'You are not authorized to make this request', 403);
+        }
     }
 }
