@@ -81,13 +81,8 @@ class ExpensesController extends Controller
      */
     public function destroy(Expense $expense)
     {
-        return $this->isNotAuthorized($expense) ? $this->isNotAuthorized($expense) : $expense->delete();
+        return  $expense->delete();
     }
 
-    private function isNotAuthorized($month)
-    {
-        if (Month::where('month_id', $month) !== $month->user_id) {
-            return $this->error('', 'You are not authorized to make this request', 403);
-        }
-    }
+    
 }

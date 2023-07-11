@@ -1,5 +1,6 @@
 <template>
     <div>
+    <div>
         <Navbar />
     </div>
     <div class="items-center justify-center">
@@ -89,6 +90,7 @@
             </li>
         </ul>
     </div>
+</div>
 </template>
   
 <script setup>
